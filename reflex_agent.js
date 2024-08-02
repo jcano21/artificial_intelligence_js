@@ -1,11 +1,11 @@
-function reflex_agent(location, stateA, stateB){
+function reflex_agent(location, stateA, stateB) {
     if (location == "A" && stateA == "DIRTY") return "CLEAN";
     if (location == "B" && stateB == "DIRTY") return "CLEAN";
     if (location == "A") return "RIGHT";
     if (location == "B") return "LEFT";
 }
 
-function test(states){
+function test(states) {
     var location = states[0];
     var stateA = states[1];
     var stateB = states[2];
@@ -16,7 +16,7 @@ function test(states){
                                                 " | State B: " + stateB + 
                                                 " | Action: " + action_result;
     
-    if (action_result == "CLEAN"){
+    if (action_result == "CLEAN") {
         if (location == "A") states[1] = "CLEAN";
         else if (location == "B") states[2] = "CLEAN";
     }
@@ -34,9 +34,10 @@ function test(states){
         return;
     }
     
+    // Asegurar que visitemos todos los estados
     if (visitedStates.length < 7) {
         if (states[1] == "CLEAN" && states[2] == "CLEAN") {
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.5) {
                 states[1] = "DIRTY";
             } else {
                 states[2] = "DIRTY";
@@ -46,7 +47,6 @@ function test(states){
     
     setTimeout(function(){ test(states); }, 500);
 }
-    
 
 var states = ["A","DIRTY","DIRTY"];
 var visitedStates = [];
