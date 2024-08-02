@@ -47,8 +47,6 @@ function test(states){
     setTimeout(function(){ test(states); }, 500);
 }
     
-    setTimeout(function(){ test(states); }, 1000);
-}
 
 var states = ["A","DIRTY","DIRTY"];
 var visitedStates = [];
