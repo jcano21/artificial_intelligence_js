@@ -36,7 +36,7 @@ function test(states){
     
     if (visitedStates.length < 7) {
         if (states[1] == "CLEAN" && states[2] == "CLEAN") {
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.1) {
                 states[1] = "DIRTY";
             } else {
                 states[2] = "DIRTY";
