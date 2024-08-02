@@ -34,14 +34,18 @@ function test(states){
         return;
     }
     
-    // Añadir aleatoriedad para ensuciar las habitaciones
-    if (Math.random() < 0.3) { // 30% de probabilidad de ensuciar
-        if (Math.random() < 0.5) {
-            states[1] = "DIRTY";
-        } else {
-            states[2] = "DIRTY";
+    if (visitedStates.length < 7) {
+        if (states[1] == "CLEAN" && states[2] == "CLEAN") {
+            if (Math.random() < 0.5) {
+                states[1] = "DIRTY";
+            } else {
+                states[2] = "DIRTY";
+            }
         }
     }
+    
+    setTimeout(function(){ test(states); }, 500);
+}
     
     setTimeout(function(){ test(states); }, 1000);
 }
