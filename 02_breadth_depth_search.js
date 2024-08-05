@@ -82,8 +82,8 @@ function profundidad(start, end, successors){
 
 //anchura(6, 14, successors4x4)
 //profundidad(1, 16, successors4x4)
-//profundidad(2, 8, successors3x3)
-profundidad(1, 16, successors4x4)
+profundidad(2, 8, successors3x3)
+//profundidad(1, 16, successors4x4)
 
 
 //anchura(1, 9, successors3x3)
