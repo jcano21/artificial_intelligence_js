@@ -2,6 +2,9 @@
 -
 [Reflex Agent](https://jcano21.github.io/artificial_intelligence_js/reflex_agent.html)
 
-[Bsuqieda](https://jcano21.github.io/artificial_intelligence_js/02_breadth_depth_search.html)
+[Busqueda](https://jcano21.github.io/artificial_intelligence_js/02_breadth_depth_search.html)
 
-[Busquieda
+
+[Proyecto2](https://jcano21.github.io/artificial_intelligence_js/Proyecto2/index.html)
+
+

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning con Tytus.js</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Machine Learning con Tytus.js</h1>
+        
+        <!-- Selector de archivo -->
+        <section class="section">
+            <h2>1. Selección de Datos</h2>
+            <input type="file" id="fileInput" accept=".csv">
+            <div id="dataPreview"></div>
+        </section>
+
+        <!-- Configuración del modelo -->
+        <section class="section">
+            <h2>2. Configuración del Modelo</h2>
+            
+            <div class="config-group">
+                <label for="modelSelect">Seleccione el Modelo:</label>
+                <select id="modelSelect">
+                    <option value="">Seleccione un modelo...</option>
+                    <option value="linearRegression">Regresión Lineal</option>
+                    <option value="polynomialRegression">Regresión Polinomial</option>
+                    <!-- Agregar más modelos según tytus.js -->
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label for="trainSplit">Porcentaje de datos de entrenamiento:</label>
+                <input type="range" id="trainSplit" min="50" max="90" value="80">
+                <span id="trainSplitValue">80%</span>
+            </div>
+
+            <div class="config-group">
+                <label for="objective">Objetivo del entrenamiento:</label>
+                <select id="objective">
+                    <option value="prediction">Predicción</option>
+                    <option value="classification">Clasificación</option>
+                    <option value="pattern">Patrones</option>
+                </select>
+            </div>
+
+            <!-- Parámetros específicos del modelo -->
+            <div id="modelParams" class="config-group">
+                <!-- Se llenará dinámicamente según el modelo seleccionado -->
+            </div>
+
+            <!-- Selección de variables -->
+            <div class="config-group">
+                <label>Variables de entrada:</label>
+                <div id="inputVars"></div>
+                
+                <label>Variable de salida:</label>
+                <select id="outputVar"></select>
+            </div>
+        </section>
+
+        <!-- Botones de control -->
+        <section class="section">
+            <h2>3. Operaciones</h2>
+            <div class="button-group">
+                <button id="trainButton">Entrenar Modelo</button>
+                <button id="predictButton" disabled>Realizar Predicción</button>
+                <button id="plotButton" disabled>Mostrar Gráficas</button>
+            </div>
+        </section>
+
+        <!-- Área de resultados -->
+        <section class="section">
+            <h2>4. Resultados</h2>
+            <div id="results">
+                <div id="metrics"></div>
+                <div id="plot"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://github.com/tytusdb/tytusjs/blob/main/dist/tytus.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
