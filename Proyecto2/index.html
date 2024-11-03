@@ -1,88 +1,442 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning con Tytus.js</title>
+    <title>Machine Learning</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="tytus.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Machine Learning con Tytus.js</h1>
-        
-        <!-- Selector de archivo -->
-        <section class="section">
-            <h2>1. Selección de Datos</h2>
-            <input type="file" id="fileInput" accept=".csv">
-            <div id="dataPreview"></div>
-        </section>
+    <div class="wrapper">
+        <nav>
+            <h1>Proyecto 2</h1>
+        </nav>
 
-        <!-- Configuración del modelo -->
-        <section class="section">
-            <h2>2. Configuración del Modelo</h2>
-            
-            <div class="config-group">
-                <label for="modelSelect">Seleccione el Modelo:</label>
+        <section class="content">
+            <h2>Inteligencia Artificial 1</h2>
+
+            <div class="model-selection">
+                <label for="modelSelect">Seleccione el modelo:</label>
                 <select id="modelSelect">
-                    <option value="">Seleccione un modelo...</option>
-                    <option value="linearRegression">Regresión Lineal</option>
-                    <option value="polynomialRegression">Regresión Polinomial</option>
-                    <!-- Agregar más modelos según tytus.js -->
+                    <option value="regresionLineal">Regresión Lineal</option>
+                    <option value="regresionPolinomial">Regresión Polinomial</option>
+                    <option value="redesNeuronales">Redes Neuronales</option>
+                    <option value="naive_bayes">Naive Bayes </option>
                 </select>
             </div>
 
-            <div class="config-group">
-                <label for="trainSplit">Porcentaje de datos de entrenamiento:</label>
-                <input type="range" id="trainSplit" min="50" max="90" value="80">
-                <span id="trainSplitValue">80%</span>
+            <div class="file-upload">
+                <input type="file" id="fileInput" accept=".csv" />
             </div>
 
-            <div class="config-group">
-                <label for="objective">Objetivo del entrenamiento:</label>
-                <select id="objective">
-                    <option value="prediction">Predicción</option>
-                    <option value="classification">Clasificación</option>
-                    <option value="pattern">Patrones</option>
-                </select>
+  
+    <div id="polynomialDegreeContainer" style="display: block">
+        <label for="polynomialDegree">Grado de la Regresión Polinómica:</label>
+        <input type="number" id="polynomialDegree" min="1" max="10" value="2" />
+        <br /><br />
+      </div>
+  
+
+      <div id="trainPercentageContainer" style="display: block">
+        <label for="trainPercentage">Porcentaje de Entrenamiento:</label>
+        <input type="number" id="trainPercentage" min="1" max="100" value="80" />
+        <br /><br />
+      </div>
+
+      <div id="naiveBayesFormContainer" style="display: none"></div>
+
+
+
+            <div class="buttons">
+                <button class="btn" onclick="EntrenarModelo()">Entrenamiento</button>
+                <button class="btn" onclick="predictModel()">Predicción</button>
+                <button class="btn" onclick="showGraph()">Mostrar Gráficas</button>
+                <button class="btn" onclick="showTrend()">Tendencia</button>
+                <button class="btn" onclick="showPatterns()">Patrones</button>
             </div>
 
-            <!-- Parámetros específicos del modelo -->
-            <div id="modelParams" class="config-group">
-                <!-- Se llenará dinámicamente según el modelo seleccionado -->
-            </div>
+            <table id="csvPreview" class="csv-preview"></table>
 
-            <!-- Selección de variables -->
-            <div class="config-group">
-                <label>Variables de entrada:</label>
-                <div id="inputVars"></div>
-                
-                <label>Variable de salida:</label>
-                <select id="outputVar"></select>
-            </div>
-        </section>
+            <p id="log"></p>
 
-        <!-- Botones de control -->
-        <section class="section">
-            <h2>3. Operaciones</h2>
-            <div class="button-group">
-                <button id="trainButton">Entrenar Modelo</button>
-                <button id="predictButton" disabled>Realizar Predicción</button>
-                <button id="plotButton" disabled>Mostrar Gráficas</button>
-            </div>
-        </section>
+            <div id="chart_div" class="chart"></div>
 
-        <!-- Área de resultados -->
-        <section class="section">
-            <h2>4. Resultados</h2>
-            <div id="results">
-                <div id="metrics"></div>
-                <div id="plot"></div>
-            </div>
+            <div
+            id="naiveBayesPredictionContainer"
+            style="
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            "
+        >
+            <h3>Resultado de la Predicción Naive Bayes</h3>
+            <p id="naiveBayesPredictionText"></p>
+        </div>
+
         </section>
     </div>
-
-    <!-- Scripts -->
-    <script src="https://github.com/tytusdb/tytusjs/blob/main/dist/tytus.js"></script>
-    <script src="script.js"></script>
 </body>
+
+</html>
+
+
+<script type="text/javascript">
+    let xTrain = [];
+    let yTrain = [];
+    let yPredict = [];
+    let linear,polynomial; 
+    let yPredictDegree2 = [];
+    let yPredictDegree3 = [];
+    let yPredictDegree4 = [];
+    let r2, r3, r4;
+
+
+    function trainNeuralNetworks() {
+        CargarCSV();
+
+        // Primer red neuronal
+        let design1 = [2, 4, 3, 2];
+        let brain1 = new NeuralNetwork(design1);
+        for (let i = 0; i < xTrain.length; i++) {
+            let input = [xTrain[i], yTrain[i]];
+            let output = (xTrain[i] > yTrain[i] ? [1, 0] : [0, 1]);
+            brain1.Entrenar(input, output);
+        }
+
+        let largest1 = brain1.Predecir([10, 20]);
+        document.getElementById("logE").innerHTML = String("Probability Score for Largest: " + brain1.Predecir([10, 20]));
+        console.log(`Probability Score for Largest (Brain 1): ${largest1}`);
+
+        // Segunda red neuronal
+        let design2 = [2, 4, 3, 2];
+        let brain2 = new NeuralNetwork(design2);
+        for (let i = 0; i < xTrain.length; i++) {
+            let input = [xTrain[i], yTrain[i]];
+            let output = (xTrain[i] < yTrain[i] ? [1, 0] : [0, 1]);
+            brain2.Entrenar(input, output);
+        }
+
+        let largest2 = brain2.Predecir([20, 5]);
+        document.getElementById("logEE").innerHTML = String("Probability Score for Largest: " + brain2.Predecir([20, 5]));
+        console.log(`Probability Score for Largest (Brain 2): ${largest2}`);
+    }
+
+    function CargarCSV() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('Por favor, selecciona un archivo CSV.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const csvData = event.target.result;
+            processCSV(csvData);
+        };
+        reader.readAsText(file);
+    }
+
+    function processCSV(data) {
+        const lines = data.split('\n');
+        const headers = lines[0].split(',').map(header => header.trim());
+        xTrain = [];
+        yTrain = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].split(',');
+            if (line.length === 2) {
+                xTrain.push(parseFloat(line[0]));
+                yTrain.push(parseFloat(line[1]));
+            }
+        }
+        document.getElementById("log").innerHTML += '<br>CSV cargado exitosamente.';
+
+        displayCSVPreview(headers, lines.slice(1, 6));
+    }
+
+    function displayCSVPreview(headers, rows) {
+            const table = document.getElementById("csvPreview");
+            table.innerHTML = ''; // Limpiar contenido previo
+
+            // Crear la fila de encabezados
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Agregar las primeras 5 filas
+            rows.forEach(row => {
+                const dataRow = document.createElement('tr');
+                const cells = row.split(',');
+                cells.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell.trim();
+                    dataRow.appendChild(td);
+                });
+                table.appendChild(dataRow);
+            });
+        }
+
+    
+
+    function EntrenarModelo() {
+        document.getElementById("log").innerHTML = "";
+        const model = document.getElementById('modelSelect').value;
+
+        if (model === 'regresionLineal') {
+            CargarCSV();
+            linear = new LinearRegression();
+            linear.fit(xTrain, yTrain);
+            document.getElementById("log").innerHTML += '<br>Modelo de Regresión Lineal entrenado.<br>';
+        } else if (model === 'regresionPolinomial') {
+            CargarCSV();
+            polynomial = new PolynomialRegression();
+
+            // Entrenamiento y predicción para grados 2, 3 y 4
+            polynomial.fit(xTrain, yTrain, 2);
+            yPredictDegree2 = polynomial.predict(xTrain);
+            r2 = polynomial.getError();
+
+            polynomial.fit(xTrain, yTrain, 3);
+            yPredictDegree3 = polynomial.predict(xTrain);
+            r3 = polynomial.getError();
+
+            polynomial.fit(xTrain, yTrain, 4);
+            yPredictDegree4 = polynomial.predict(xTrain);
+            r4 = polynomial.getError();
+
+            // Redondear valores
+            [yPredictDegree2, yPredictDegree3, yPredictDegree4].forEach(arr => {
+                for (let i = 0; i < arr.length; i++) {
+                    arr[i] = Number(arr[i].toFixed(2));
+                }
+            });
+
+            document.getElementById("log").innerHTML += `
+    <div class="log-entry">
+        <h3>Modelo de Regresión Polinomial Entrenado</h3>
+        <p><strong>X Train:</strong> ${xTrain.join(', ')}</p>
+        <p><strong>Y Train:</strong> ${yTrain.join(', ')}</p>
+        <ul>
+            <li><strong>Y Predicción Grado 2:</strong> ${yPredictDegree2.join(', ')}</li>
+            <li><strong>Y Predicción Grado 3:</strong> ${yPredictDegree3.join(', ')}</li>
+            <li><strong>Y Predicción Grado 4:</strong> ${yPredictDegree4.join(', ')}</li>
+            <li><strong>R<sup>2</sup> Grado 2:</strong> ${Number(r2.toFixed(2))}</li>
+            <li><strong>R<sup>2</sup> Grado 3:</strong> ${Number(r3.toFixed(2))}</li>
+            <li><strong>R<sup>2</sup> Grado 4:</strong> ${Number(r4.toFixed(2))}</li>
+        </ul>
+    </div>
+`;
+        } else if (model === 'redesNeuronales') {
+            trainNeuralNetworks();
+
+        }else if (model === 'naive_bayes') {
+            console.log("Naives")
+
+        }
+         else {
+            alert('Por favor, selecciona un modelo válido para entrenar.');
+        }
+    }
+
+
+
+    function predictPolynomial() {
+        if (polynomial) {
+            const predictArray = xTrain;
+            yPredictDegree2 = polynomial.predict(predictArray);
+            yPredictDegree3 = polynomial.predict(predictArray);
+            yPredictDegree4 = polynomial.predict(predictArray);
+            document.getElementById("log").innerHTML += '<br>Predicción Polinomial realizada.';
+        } else {
+            alert('Primero entrena el modelo de regresión polinomial antes de predecir.');
+        }
+    }
+
+    function joinArrays() {
+        var a = [];
+        if (arguments.length > 0) {
+            // Agrega los encabezados
+            var headers = [];
+            for (var i = 0; i < arguments.length; i += 2) {
+                headers.push(arguments[i]); // Tomar los nombres de las series
+            }
+            a.push(headers);
+
+            // Asumiendo que todas las series tienen la misma longitud
+            var maxLength = arguments[1].length; // Longitud de la primera serie
+            for (var i = 0; i < maxLength; i++) {
+                var row = [];
+                for (var j = 1; j < arguments.length; j += 2) {
+                    row.push(arguments[j][i]); // Agregar los valores de cada serie
+                }
+                a.push(row);
+            }
+        }
+        return a;
+    }
+
+
+    function showPolynomialGraph() {
+        if (yPredictDegree2.length > 0 || yPredictDegree3.length > 0 || yPredictDegree4.length > 0) {
+            var dataArray = joinArrays(
+                'x', xTrain,
+                'Y Train', yTrain,
+                'Predicción Grado 2', yPredictDegree2,
+                'Predicción Grado 3', yPredictDegree3,
+                'Predicción Grado 4', yPredictDegree4
+            );
+
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(() => {
+                var data = google.visualization.arrayToDataTable(dataArray);
+                var options = {
+                    seriesType: 'bar',
+                    series: {
+                        1: { type: 'line' },
+                        2: { type: 'line' },
+                        3: { type: 'line' }
+                    }
+                };
+                var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+            });
+        } else {
+            alert('Primero realiza una predicción polinomial para mostrar la gráfica.');
+        }
+    }
+
+
+    function predictModel() {
+        const model = document.getElementById('modelSelect').value;
+        if (model === 'regresionPolinomial') {
+            predictPolynomial();
+        } else {
+            if (linear) {
+                yPredict = linear.predict(xTrain);
+                document.getElementById("log").innerHTML += '<br>Predicción realizada.<br>Y Predict: ' + yPredict;
+            } else {
+                alert('Primero entrena el modelo antes de predecir.');
+            }
+
+        }
+
+    }
+
+    function showGraph() {
+        const model = document.getElementById('modelSelect').value;
+        if (model === 'regresionPolinomial') {
+            showPolynomialGraph();
+        } else {
+            if (yPredict.length > 0) {
+                const dataArray = joinArrays('x', xTrain, 'yTrain', yTrain, 'yPredict', yPredict);
+
+                google.charts.load('current', { 'packages': ['corechart'] });
+                google.charts.setOnLoadCallback(() => drawChart(dataArray));
+            } else {
+                alert('Primero realiza una predicción para mostrar la gráfica.');
+            }
+        }
+
+    }
+
+    function showTrend() {
+        if (xTrain.length > 1 && yTrain.length > 1) {
+            const trendData = [];
+            for (let i = 0; i < xTrain.length; i++) {
+                trendData.push([xTrain[i], yTrain[i]]);
+            }
+
+            const slope = (yTrain[yTrain.length - 1] - yTrain[0]) / (xTrain[xTrain.length - 1] - xTrain[0]);
+            const trendText = slope > 0 ? "La tendencia es ascendente." : "La tendencia es descendente.";
+
+            document.getElementById("log").innerHTML += `<br>${trendText}`;
+
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(() => drawTrendChart(trendData));
+        } else {
+            alert('Primero carga y entrena un modelo con datos suficientes.');
+        }
+    }
+
+    function showPatterns() {
+        if (xTrain.length > 1 && yTrain.length > 1) {
+            const avgData = xTrain.map((x, index) => [x, yTrain[index]]);
+
+         
+            let peaks = 0, valleys = 0;
+            for (let i = 1; i < yTrain.length - 1; i++) {
+                if (yTrain[i] > yTrain[i - 1] && yTrain[i] > yTrain[i + 1]) peaks++;
+                if (yTrain[i] < yTrain[i - 1] && yTrain[i] < yTrain[i + 1]) valleys++;
+            }
+
+            const patternText = `Patrones detectados: ${peaks} picos y ${valleys} valles en los datos.`;
+            document.getElementById("log").innerHTML += `<br>${patternText}`;
+
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(() => drawPatternChart(avgData));
+        } else {
+            alert('Primero carga y entrena un modelo con datos suficientes.');
+        }
+    }
+
+    function drawChart(dataArray) {
+        var data = google.visualization.arrayToDataTable(dataArray);
+        var options = {
+            seriesType: 'bar',
+            series: { 1: { type: 'line' } }
+        };
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawChart2(dataArray) {
+        var data = google.visualization.arrayToDataTable(dataArray);
+        var options = {
+            seriesType: 'bar',
+            series: {
+                1: { type: 'line' },
+                2: { type: 'line' },
+                3: { type: 'line' }
+            }
+        };
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawTrendChart(dataArray) {
+        const data = google.visualization.arrayToDataTable([['X', 'Y'], ...dataArray]);
+        const options = {
+            title: 'Tendencia de los datos',
+            trendlines: { 0: {} },
+            legend: { position: 'bottom' }
+        };
+        const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawPatternChart(dataArray) {
+        const data = google.visualization.arrayToDataTable([['X', 'Y'], ...dataArray]);
+        const options = {
+            title: 'Patrones en los datos',
+            hAxis: { title: 'X' },
+            vAxis: { title: 'Y' },
+            legend: 'none'
+        };
+        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+</body>
+
 </html>
