@@ -86,8 +86,8 @@
 
 
 <script type="text/javascript">
-    let xTrain = [];
-    let yTrain = [];
+    let ejex = [];
+    let ejey = [];
     let yPredict = [];
     let linear,polynomial; 
     let yPredictDegree2 = [];
@@ -102,9 +102,9 @@
         // Primer red neuronal
         let design1 = [2, 4, 3, 2];
         let brain1 = new NeuralNetwork(design1);
-        for (let i = 0; i < xTrain.length; i++) {
-            let input = [xTrain[i], yTrain[i]];
-            let output = (xTrain[i] > yTrain[i] ? [1, 0] : [0, 1]);
+        for (let i = 0; i < ejex.length; i++) {
+            let input = [ejex[i], ejey[i]];
+            let output = (ejex[i] > ejey[i] ? [1, 0] : [0, 1]);
             brain1.Entrenar(input, output);
         }
 
@@ -115,9 +115,9 @@
         // Segunda red neuronal
         let design2 = [2, 4, 3, 2];
         let brain2 = new NeuralNetwork(design2);
-        for (let i = 0; i < xTrain.length; i++) {
-            let input = [xTrain[i], yTrain[i]];
-            let output = (xTrain[i] < yTrain[i] ? [1, 0] : [0, 1]);
+        for (let i = 0; i < ejex.length; i++) {
+            let input = [ejex[i], ejey[i]];
+            let output = (ejex[i] < ejey[i] ? [1, 0] : [0, 1]);
             brain2.Entrenar(input, output);
         }
 
@@ -146,14 +146,14 @@
     function processCSV(data) {
         const lines = data.split('\n');
         const headers = lines[0].split(',').map(header => header.trim());
-        xTrain = [];
-        yTrain = [];
+        ejex = [];
+        ejey = [];
 
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].split(',');
             if (line.length === 2) {
-                xTrain.push(parseFloat(line[0]));
-                yTrain.push(parseFloat(line[1]));
+                ejex.push(parseFloat(line[0]));
+                ejey.push(parseFloat(line[1]));
             }
         }
         document.getElementById("log").innerHTML += '<br>CSV cargado exitosamente.';
@@ -196,23 +196,23 @@
         if (model === 'regresionLineal') {
             CargarCSV();
             linear = new LinearRegression();
-            linear.fit(xTrain, yTrain);
+            linear.fit(ejex, ejey);
             document.getElementById("log").innerHTML += '<br>Modelo de Regresión Lineal entrenado.<br>';
         } else if (model === 'regresionPolinomial') {
             CargarCSV();
             polynomial = new PolynomialRegression();
 
             // Entrenamiento y predicción para grados 2, 3 y 4
-            polynomial.fit(xTrain, yTrain, 2);
-            yPredictDegree2 = polynomial.predict(xTrain);
+            polynomial.fit(ejex, ejey, 2);
+            yPredictDegree2 = polynomial.predict(ejex);
             r2 = polynomial.getError();
 
-            polynomial.fit(xTrain, yTrain, 3);
-            yPredictDegree3 = polynomial.predict(xTrain);
+            polynomial.fit(ejex, ejey, 3);
+            yPredictDegree3 = polynomial.predict(ejex);
             r3 = polynomial.getError();
 
-            polynomial.fit(xTrain, yTrain, 4);
-            yPredictDegree4 = polynomial.predict(xTrain);
+            polynomial.fit(ejex, ejey, 4);
+            yPredictDegree4 = polynomial.predict(ejex);
             r4 = polynomial.getError();
 
             // Redondear valores
@@ -225,8 +225,8 @@
             document.getElementById("log").innerHTML += `
     <div class="log-entry">
         <h3>Modelo de Regresión Polinomial Entrenado</h3>
-        <p><strong>X Train:</strong> ${xTrain.join(', ')}</p>
-        <p><strong>Y Train:</strong> ${yTrain.join(', ')}</p>
+        <p><strong>X Train:</strong> ${ejex.join(', ')}</p>
+        <p><strong>Y Train:</strong> ${ejey.join(', ')}</p>
         <ul>
             <li><strong>Y Predicción Grado 2:</strong> ${yPredictDegree2.join(', ')}</li>
             <li><strong>Y Predicción Grado 3:</strong> ${yPredictDegree3.join(', ')}</li>
@@ -253,7 +253,7 @@
 
     function predictPolynomial() {
         if (polynomial) {
-            const predictArray = xTrain;
+            const predictArray = ejex;
             yPredictDegree2 = polynomial.predict(predictArray);
             yPredictDegree3 = polynomial.predict(predictArray);
             yPredictDegree4 = polynomial.predict(predictArray);
@@ -290,8 +290,8 @@
     function showPolynomialGraph() {
         if (yPredictDegree2.length > 0 || yPredictDegree3.length > 0 || yPredictDegree4.length > 0) {
             var dataArray = joinArrays(
-                'x', xTrain,
-                'Y Train', yTrain,
+                'x', ejex,
+                'Y Train', ejey,
                 'Predicción Grado 2', yPredictDegree2,
                 'Predicción Grado 3', yPredictDegree3,
                 'Predicción Grado 4', yPredictDegree4
@@ -323,7 +323,7 @@
             predictPolynomial();
         } else {
             if (linear) {
-                yPredict = linear.predict(xTrain);
+                yPredict = linear.predict(ejex);
                 document.getElementById("log").innerHTML += '<br>Predicción realizada.<br>Y Predict: ' + yPredict;
             } else {
                 alert('Primero entrena el modelo antes de predecir.');
@@ -339,7 +339,7 @@
             showPolynomialGraph();
         } else {
             if (yPredict.length > 0) {
-                const dataArray = joinArrays('x', xTrain, 'yTrain', yTrain, 'yPredict', yPredict);
+                const dataArray = joinArrays('x', ejex, 'ejey', ejey, 'yPredict', yPredict);
 
                 google.charts.load('current', { 'packages': ['corechart'] });
                 google.charts.setOnLoadCallback(() => drawChart(dataArray));
@@ -351,13 +351,13 @@
     }
 
     function showTrend() {
-        if (xTrain.length > 1 && yTrain.length > 1) {
+        if (ejex.length > 1 && ejey.length > 1) {
             const trendData = [];
-            for (let i = 0; i < xTrain.length; i++) {
-                trendData.push([xTrain[i], yTrain[i]]);
+            for (let i = 0; i < ejex.length; i++) {
+                trendData.push([ejex[i], ejey[i]]);
             }
 
-            const slope = (yTrain[yTrain.length - 1] - yTrain[0]) / (xTrain[xTrain.length - 1] - xTrain[0]);
+            const slope = (ejey[ejey.length - 1] - ejey[0]) / (ejex[ejex.length - 1] - ejex[0]);
             const trendText = slope > 0 ? "La tendencia es ascendente." : "La tendencia es descendente.";
 
             document.getElementById("log").innerHTML += `<br>${trendText}`;
@@ -370,14 +370,14 @@
     }
 
     function showPatterns() {
-        if (xTrain.length > 1 && yTrain.length > 1) {
-            const avgData = xTrain.map((x, index) => [x, yTrain[index]]);
+        if (ejex.length > 1 && ejey.length > 1) {
+            const avgData = ejex.map((x, index) => [x, ejey[index]]);
 
          
             let peaks = 0, valleys = 0;
-            for (let i = 1; i < yTrain.length - 1; i++) {
-                if (yTrain[i] > yTrain[i - 1] && yTrain[i] > yTrain[i + 1]) peaks++;
-                if (yTrain[i] < yTrain[i - 1] && yTrain[i] < yTrain[i + 1]) valleys++;
+            for (let i = 1; i < ejey.length - 1; i++) {
+                if (ejey[i] > ejey[i - 1] && ejey[i] > ejey[i + 1]) peaks++;
+                if (ejey[i] < ejey[i - 1] && ejey[i] < ejey[i + 1]) valleys++;
             }
 
             const patternText = `Patrones detectados: ${peaks} picos y ${valleys} valles en los datos.`;
